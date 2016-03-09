@@ -1,0 +1,197 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.1",
+        "title": "Tokenly Music Public API",
+        "description": "API methods for Tokenly Music.  API calls begin with https://music-stage.tokenly.com.  Protected API calls require authentication.  See https://github.com/tokenly/hmac-auth/blob/master/README.md for details."
+    },
+    "host": "music-stage.tokenly.com",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/api/v1",
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "apiKey": {
+            "description": "Requires API key with signature and nonce headers.  See https://github.com/tokenly/hmac-auth/blob/master/README.md for details.",
+            "type": "apiKey",
+            "name": "X-Tokenly-Auth-Api-Token",
+            "in": "header"
+        }
+    },
+    "tags": [
+        {
+            "name": "public",
+            "description": "Public API Calls"
+        },
+        {
+            "name": "protected",
+            "description": "Protected API Calls"
+        }
+    ],
+    "paths": {
+        "/music/catalog/albums": {
+            "get": {
+                "summary": "List all available albums",
+                "tags": [
+                    "public"
+                ],
+                "description": "Returns a list of albums.\n",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Album"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/music/catalog/songs/{album}": {
+            "get": {
+                "summary": "List all available albums",
+                "tags": [
+                    "public"
+                ],
+                "description": "Returns a list of songs for this album.\n",
+                "parameters": [
+                    {
+                        "name": "album",
+                        "in": "path",
+                        "description": "Album identifier",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Song"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/music/song/download/{song}": {
+            "get": {
+                "summary": "Get the download access information for this song",
+                "tags": [
+                    "protected"
+                ],
+                "description": "Returns song information, including the download link for this song.\n",
+                "security": [
+                    {
+                        "apiKey": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "song",
+                        "in": "path",
+                        "description": "Song identifier",
+                        "required": true,
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/SongWithDownload"
+                        }
+                    },
+                    "403": {
+                        "description": "Not Authorized",
+                        "examples": {
+                            "errors": "Not authorized for this song."
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "examples": {
+                            "errors": "Song not found with this id."
+                        }
+                    },
+                    "410": {
+                        "description": "Not Available",
+                        "examples": {
+                            "errors": "This song file is not available."
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Album": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The album unique identifier"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The album name"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Album description",
+                    "format": "text"
+                }
+            }
+        },
+        "Song": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "description": "The song unique identifier"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The song name"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Song description",
+                    "format": "text"
+                }
+            }
+        },
+        "SongWithDownload": {
+            "description": "Song with download information",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Song"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "downloadUrl": {
+                            "type": "string",
+                            "format": "url",
+                            "description": "The url of the audio file to download"
+                        },
+                        "downloadSize": {
+                            "type": "integer",
+                            "format": "int64",
+                            "description": "The audio file size in bytes"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
