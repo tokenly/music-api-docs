@@ -149,6 +149,11 @@
                     "type": "string",
                     "description": "Album description",
                     "format": "text"
+                },
+                "songCount": {
+                    "type": "number",
+                    "description": "Number of available songs for this album",
+                    "format": "int32"
                 }
             }
         },
