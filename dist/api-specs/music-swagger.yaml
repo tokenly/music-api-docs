@@ -45,7 +45,7 @@ paths:
   # ----------------------------------------------------------------------------
   /music/catalog/songs/{album}:
     get:
-      summary: List all available albums
+      summary: List all available songs for this album
       tags: [public]
       description: |
         Returns a list of songs for this album.
