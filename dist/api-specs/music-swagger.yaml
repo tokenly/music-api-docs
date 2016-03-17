@@ -24,6 +24,8 @@ tags:
     description: Public API Calls
   - name: protected
     description: Protected API Calls
+  - name: account
+    description: Account API Calls
 
 paths:
   # ----------------------------------------------------------------------------
@@ -66,13 +68,14 @@ paths:
             items:
               $ref: '#/definitions/Song'
 
+  # ----------------------------------------------------------------------------
   /music/song/download/{song}:
     get:
       summary: Get the download access information for this song
       tags: [protected]
       description: |
         Returns song information, including the download link for this song.
-      security: 
+      security:
         - apiKey: []
       parameters:
         -
@@ -103,6 +106,88 @@ paths:
           description: Not Available
           examples:
             errors: This song file is not available.
+
+
+  # ----------------------------------------------------------------------------
+  /account/register:
+    post:
+      summary: Register a new account
+      tags: [account]
+      description: |
+        Registers a new account.  The credentials can be a new account or match an existing TokenPass account.  If the username matches an existing TokenPass account, then the password must match as well.  Simiilary, if the email matches an existing TokenPass account, then the username and password must match as well
+      parameters:
+        -
+          name: username
+          in: formData
+          description: Username credential
+          required: true
+          type: string
+          format: string
+        -
+          name: email
+          in: formData
+          description: Email address
+          required: true
+          type: string
+          format: email
+        -
+          name: password
+          in: formData
+          description: Password credential
+          required: true
+          type: string
+          format: password
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/UserWithCredentials'
+
+        403:
+          description: Registration error
+          examples:
+            message: These credentials do not match our records.
+
+        422:
+          description: Registration error
+          examples:
+            message: Username already taken.
+
+  # ----------------------------------------------------------------------------
+  /account/login:
+    post:
+      summary: Login to an existing account
+      tags: [account]
+      description: |
+        Login to an exsting Tokenly Music or TokenPass account with a username and password.
+      parameters:
+        -
+          name: username
+          in: formData
+          description: Username credential
+          required: true
+          type: string
+          format: string
+        -
+          name: password
+          in: formData
+          description: Password credential
+          required: true
+          type: string
+          format: password
+
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/UserWithCredentials'
+
+        403:
+          description: Registration error
+          examples:
+            message: These credentials do not match our records.
+
 
 # ##############################################################################
 # ##############################################################################
@@ -164,4 +249,26 @@ definitions:
             format: int64
             description: The audio file size in bytes
 
-      
+# ----------------------------------------------------------------------------
+  UserWithCredentials:
+    description: User information with API credentials
+    properties:
+      id:
+        type: string
+        format: uuid
+        description: The user ID
+      username:
+        type: string
+        description: The username
+      email:
+        type: string
+        format: email
+        description: The email address
+      apiToken:
+        type: string
+        format: string
+        description: The API Token for the user
+      apiSecretKey:
+        type: string
+        format: string
+        description: The API Secret Key for the user
