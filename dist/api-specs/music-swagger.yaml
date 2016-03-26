@@ -69,6 +69,29 @@ paths:
               $ref: '#/definitions/Song'
 
   # ----------------------------------------------------------------------------
+
+  /music/mysongs:
+    get:
+      summary: Get a list of all songs that the current user has access to
+      tags: [protected]
+      description: |
+        Returns an array of songs with the download link for each song.
+      security:
+        - apiKey: []
+
+      responses:
+        200:
+          description: Successful response
+          type: array
+          items:
+            $ref: '#/definitions/SongWithDownload'
+
+        403:
+          description: Not Authorized
+          examples:
+            errors: Not authorized.
+
+
   /music/song/download/{song}:
     get:
       summary: Get the download access information for this song
@@ -222,15 +245,65 @@ definitions:
         type: string
         format: uuid
         description: The song unique identifier
-
       name:
         type: string
         description: The song name
+      tokens:
+        type: array
+        description: A list of tokens that provide access to this song
+        items:
+          type: string
 
       description:
         type: string
-        description: Song description
+        description: Song description or Artist notes
         format: text
+      performers:
+        type: string
+        format: text
+        description: The song performers
+      composers:
+        type: string
+        format: text
+        description: The song composers
+      release_date:
+        type: string
+        format: dateTime
+        description: The song release date
+      lyrics:
+        type: string
+        format: text
+        description: The song lyrics
+      credits:
+        type: string
+        format: text
+        description: The song credits
+      copyright:
+        type: string
+        format: text
+        description: The song copyright
+      ownership:
+        type: string
+        format: text
+        description: The song ownership
+      usage_rights:
+        type: string
+        format: text
+        description: The song usage rights
+      usage_prohbitions:
+        type: string
+        format: text
+        description: The song usage prohbitions
+      bitcoin_address:
+        type: string
+        format: text
+        description: The song bitcoin address for tipping
+      other:
+        type: string
+        format: text
+        description: Other notes
+
+
 
 # ----------------------------------------------------------------------------
   SongWithDownload:
